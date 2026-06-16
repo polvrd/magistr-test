@@ -21,12 +21,15 @@
     --shadow: 0 2px 12px rgba(0,0,0,.06);
   }
 
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
   }
 
   .screen { display: none; }
@@ -37,6 +40,10 @@
     max-width: 720px;
     margin: 0 auto;
     padding: 60px 24px;
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .menu-screen h1 {
     font-size: 2rem;
@@ -219,7 +226,9 @@
     max-width: 700px;
     margin: 0 auto;
     padding: 24px;
-    min-height: 100vh;
+    height: 100vh;   /* fallback */
+    height: 100dvh;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -277,6 +286,8 @@
     gap: 4px;
     flex-wrap: wrap;
     margin-bottom: 24px;
+    max-height: 56px;
+    overflow-y: auto;
   }
   .progress-dot {
     width: 24px;
@@ -300,6 +311,9 @@
 
   .question-area {
     flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
   }
@@ -386,6 +400,10 @@
     max-width: 700px;
     margin: 0 auto;
     padding: 60px 24px;
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .results-screen h1 {
     font-size: 2rem;
@@ -456,11 +474,13 @@
 
   /* ===== RESPONSIVE ===== */
   @media (max-width: 600px) {
-    .menu-screen { padding: 32px 16px; }
+    .menu-screen { padding: 24px 16px; }
     .blocks-grid { grid-template-columns: 1fr; }
-    .test-screen { padding: 16px; }
+    .test-screen { padding: 12px 16px; }
     .question-text { font-size: 1rem; }
-    .results-screen { padding: 32px 16px; }
+    .progress-dots { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; max-height: none; }
+    .progress-dot { width: 20px; height: 20px; font-size: .6rem; }
+    .results-screen { padding: 24px 16px; }
     .results-score { font-size: 2.5rem; }
   }
 </style>

@@ -530,7 +530,6 @@
     <div class="menu-actions">
       <button class="btn btn-primary" id="startBtn" onclick="startTest()" disabled>Начать тест</button>
       <button class="btn btn-secondary" onclick="resetAll()">Сбросить выбор</button>
-      <button class="btn btn-secondary" onclick="clearHistory()" style="color:var(--red);border-color:var(--red);">Сбросить историю</button>
     </div>
   </div>
 
@@ -913,23 +912,6 @@ function resetAll() {
   document.getElementById('continueBar').classList.remove('show');
   updateBlocksUI();
   saveState();
-}
-
-function clearHistory() {
-  if (confirm('Очистить всю сохранённую историю тестов? Это действие нельзя отменить.')) {
-    localStorage.removeItem('magistr_test_state');
-    state.selectedBlocks = [];
-    state.testActive = false;
-    state.finished = false;
-    state.currentQuestions = [];
-    state.currentIndex = 0;
-    state.furthestReached = 0;
-    state.answers = [];
-    state.answered = [];
-    state.results = [];
-    document.getElementById('continueBar').classList.remove('show');
-    updateBlocksUI();
-  }
 }
 
 function confirmExit() {

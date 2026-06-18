@@ -767,6 +767,7 @@ function renderQuestion() {
 
   // Next button
   const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = false;
   if (isAnswered) {
     if (idx < total - 1) {
       nextBtn.textContent = 'Далее →';
@@ -780,7 +781,7 @@ function renderQuestion() {
   } else {
     nextBtn.textContent = 'Далее →';
     nextBtn.className = 'btn btn-primary';
-    nextBtn.disabled = selectedOption === -1;
+    if (selectedOption === -1) nextBtn.disabled = true;
     if (selectedOption === -1) {
       nextBtn.onclick = null;
     } else {

@@ -79,6 +79,23 @@
     cursor: pointer;
     transition: all .15s ease;
     user-select: none;
+    position: relative;
+  }
+  .block-card .block-order {
+    position: absolute;
+    top: -6px; right: -6px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .block-card.selected .block-order {
+    display: flex;
   }
   .block-card:hover {
     border-color: var(--primary);
@@ -606,6 +623,7 @@ function renderBlocks() {
     card.className = 'block-card';
     card.dataset.idx = idx;
     card.innerHTML = `
+      <div class="block-order"></div>
       <div class="block-name">${block.name}</div>
       <div class="block-count">${block.questions.length} вопросов</div>
     `;
@@ -625,7 +643,11 @@ function toggleBlock(idx) {
 function updateBlocksUI() {
   const cards = document.querySelectorAll('.block-card');
   cards.forEach((card, idx) => {
-    card.classList.toggle('selected', state.selectedBlocks.includes(idx));
+    const order = state.selectedBlocks.indexOf(idx);
+    const isSelected = order !== -1;
+    card.classList.toggle('selected', isSelected);
+    const badge = card.querySelector('.block-order');
+    if (badge) badge.textContent = isSelected ? order + 1 : '';
   });
   const total = state.selectedBlocks.reduce((sum, idx) => sum + QUESTIONS_DATA[idx].questions.length, 0);
   document.getElementById('startBtn').disabled = state.selectedBlocks.length === 0;

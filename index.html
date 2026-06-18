@@ -550,7 +550,7 @@
       <div class="options-list" id="optionsList"></div>
     </div>
     <div class="test-bottom" id="testBottom">
-      <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Далее</button>
+      <button class="btn btn-primary" id="nextBtn">Далее</button>
     </div>
   </div>
 
@@ -609,8 +609,27 @@ let state = {
 function init() {
   renderBlocks();
   loadState();
-  if (state.testActive) {
-    document.getElementById('continueBar').classList.add('show');
+
+  // Единый обработчик кнопки "Далее/Завершить" — устанавливается один раз
+  document.getElementById('nextBtn').addEventListener('click', function() {
+    const idx = state.currentIndex;
+    const total = state.currentQuestions.length;
+    if (total === 0) return;
+
+    if (state.answered[idx]) {
+      if (idx < total - 1) {
+        nextQuestion();
+      } else {
+        finishTest();
+      }
+    } else {
+      submitAnswer();
+    }
+  });
+
+  // Автовосстановление теста после перезагрузки
+  if (state.testActive && !state.finished && state.currentQuestions.length > 0) {
+    showTest();
   }
 }
 
@@ -765,28 +784,16 @@ function renderQuestion() {
     optionsList.appendChild(btn);
   });
 
-  // Next button
+  // Next button — только текст и внешний вид, обработчик в init()
   const nextBtn = document.getElementById('nextBtn');
-  nextBtn.disabled = false;
   if (isAnswered) {
-    if (idx < total - 1) {
-      nextBtn.textContent = 'Далее →';
-      nextBtn.className = 'btn btn-primary';
-      nextBtn.onclick = nextQuestion;
-    } else {
-      nextBtn.textContent = 'Завершить';
-      nextBtn.className = 'btn btn-success';
-      nextBtn.onclick = finishTest;
-    }
+    nextBtn.textContent = (idx < total - 1) ? 'Далее →' : 'Завершить';
+    nextBtn.className = (idx < total - 1) ? 'btn btn-primary' : 'btn btn-success';
+    nextBtn.disabled = false;
   } else {
     nextBtn.textContent = 'Далее →';
     nextBtn.className = 'btn btn-primary';
-    if (selectedOption === -1) nextBtn.disabled = true;
-    if (selectedOption === -1) {
-      nextBtn.onclick = null;
-    } else {
-      nextBtn.onclick = submitAnswer;
-    }
+    nextBtn.disabled = (selectedOption === -1);
   }
 
   saveState();

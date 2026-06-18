@@ -512,7 +512,8 @@
 
     <div class="menu-actions">
       <button class="btn btn-primary" id="startBtn" onclick="startTest()" disabled>Начать тест</button>
-      <button class="btn btn-secondary" onclick="resetAll()">Сбросить</button>
+      <button class="btn btn-secondary" onclick="resetAll()">Сбросить выбор</button>
+      <button class="btn btn-secondary" onclick="clearHistory()" style="color:var(--red);border-color:var(--red);">Сбросить историю</button>
     </div>
   </div>
 
@@ -578,6 +579,7 @@ let state = {
   shuffle: true,
   currentQuestions: [],
   currentIndex: 0,
+  furthestReached: 0,
   answers: [],        // index -> selected option index (-1 = unanswered)
   answered: [],       // index -> boolean (has answer been submitted)
   results: [],        // index -> boolean (correct or not)
@@ -661,6 +663,7 @@ function startTest() {
 
   state.currentQuestions = questions;
   state.currentIndex = 0;
+  state.furthestReached = 0;
   state.answers = new Array(questions.length).fill(-1);
   state.answered = new Array(questions.length).fill(false);
   state.results = new Array(questions.length).fill(false);
@@ -706,7 +709,7 @@ function renderQuestion() {
     else if (state.answered[i] && !state.results[i]) dot.classList.add('wrong');
     dot.textContent = i + 1;
     dot.addEventListener('click', () => {
-      if (state.answered[i] || i < idx) goToQuestion(i);
+      if (state.answered[i] || i <= state.furthestReached) goToQuestion(i);
     });
     dotsContainer.appendChild(dot);
   }
@@ -749,17 +752,9 @@ function renderQuestion() {
       nextBtn.className = 'btn btn-primary';
       nextBtn.onclick = nextQuestion;
     } else {
-      // Check if all questions answered
-      const allAnswered = state.answered.every(a => a);
-      if (allAnswered) {
-        nextBtn.textContent = 'Завершить';
-        nextBtn.className = 'btn btn-success';
-        nextBtn.onclick = finishTest;
-      } else {
-        nextBtn.textContent = 'Далее →';
-        nextBtn.className = 'btn btn-primary';
-        nextBtn.onclick = nextQuestion;
-      }
+      nextBtn.textContent = 'Завершить';
+      nextBtn.className = 'btn btn-success';
+      nextBtn.onclick = finishTest;
     }
   } else {
     nextBtn.textContent = 'Далее →';
@@ -798,6 +793,9 @@ function submitAnswer() {
 function nextQuestion() {
   if (state.currentIndex < state.currentQuestions.length - 1) {
     state.currentIndex++;
+    if (state.currentIndex > state.furthestReached) {
+      state.furthestReached = state.currentIndex;
+    }
     renderQuestion();
   }
 }
@@ -895,6 +893,23 @@ function resetAll() {
   saveState();
 }
 
+function clearHistory() {
+  if (confirm('Очистить всю сохранённую историю тестов? Это действие нельзя отменить.')) {
+    localStorage.removeItem('magistr_test_state');
+    state.selectedBlocks = [];
+    state.testActive = false;
+    state.finished = false;
+    state.currentQuestions = [];
+    state.currentIndex = 0;
+    state.furthestReached = 0;
+    state.answers = [];
+    state.answered = [];
+    state.results = [];
+    document.getElementById('continueBar').classList.remove('show');
+    updateBlocksUI();
+  }
+}
+
 function confirmExit() {
   if (confirm('Вы уверены, что хотите выйти? Прогресс сохранится.')) {
     backToMenu();
@@ -911,6 +926,7 @@ function saveState() {
       shuffle: state.shuffle,
       currentQuestions: state.currentQuestions,
       currentIndex: state.currentIndex,
+      furthestReached: state.furthestReached,
       answers: state.answers,
       answered: state.answered,
       results: state.results,
@@ -930,6 +946,7 @@ function loadState() {
       state.shuffle = data.shuffle !== undefined ? data.shuffle : true;
       state.currentQuestions = data.currentQuestions || [];
       state.currentIndex = data.currentIndex || 0;
+      state.furthestReached = data.furthestReached || 0;
       state.answers = data.answers || [];
       state.answered = data.answered || [];
       state.results = data.results || [];
